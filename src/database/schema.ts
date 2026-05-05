@@ -24,6 +24,8 @@ export const loanStatusEnum = pgEnum('loan_status', [
   'OVERDUE',
 ]);
 
+export const roleEnum = pgEnum('role', ['admin', 'user']);
+
 // --- TABLES ---
 
 export const inventory = pgTable('inventory', {
@@ -48,6 +50,15 @@ export const loans = pgTable('loans', {
   notes: text('notes'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 100 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  password: text('password').notNull(),
+  role: roleEnum('role').default('user').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
 // --- RELATIONS ---

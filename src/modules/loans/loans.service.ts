@@ -68,6 +68,28 @@ export class LoansService {
     });
   }
 
+  async rejectLoan(loanId: string) {
+    return await this.db.transaction(async (tx) => {
+      const loan = await tx.query.loans.findFirst({
+        where: eq(schema.loans.id, loanId),
+      });
+
+      if (!loan) throw new NotFoundException('Data peminjaman tidak ditemukan');
+      if (loan.status !== 'PENDING')
+        throw new BadRequestException(
+          'Hanya status PENDING yang bisa disetujui',
+        );
+
+      const updated = await tx
+        .update(schema.loans)
+        .set({ status: 'REJECTED', updatedAt: new Date() })
+        .where(eq(schema.loans.id, loanId))
+        .returning();
+
+      return updated[0];
+    });
+  }
+
   // 3. Pengembalian Barang (Status jadi RETURNED & Update Inventory jadi AVAILABLE)
   async returnItem(loanId: string) {
     return await this.db.transaction(async (tx) => {

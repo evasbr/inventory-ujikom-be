@@ -20,6 +20,12 @@ export class LoansController {
     return this.loansService.approveLoan(id);
   }
 
+  @Patch(':id/reject')
+  @ApiOperation({ summary: 'Proses penolakan peminjaman' })
+  reject(@Param('id') id: string) {
+    return this.loansService.rejectLoan(id);
+  }
+
   @Patch(':id/return')
   @ApiOperation({ summary: 'Proses pengembalian barang' })
   return(@Param('id') id: string) {
