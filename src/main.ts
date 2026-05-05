@@ -9,8 +9,8 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('Backend Template Documentation')
-    .setDescription('Documentation for Backend Template')
+    .setTitle('Inventory Management Documentation')
+    .setDescription('Documentation for Inventory Management API')
     .setVersion('1.0')
     // .addBearerAuth()
     // .addCookieAuth(
