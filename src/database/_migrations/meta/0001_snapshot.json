@@ -1,6 +1,6 @@
 {
-  "id": "55eeca5b-3928-4041-9f95-f4a0a219ef21",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "f84687ca-4674-41d2-ab0b-0fd10d6a74f4",
+  "prevId": "55eeca5b-3928-4041-9f95-f4a0a219ef21",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -106,7 +106,7 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
-          "default": "'BORROWED'"
+          "default": "'PENDING'"
         },
         "notes": {
           "name": "notes",
@@ -166,7 +166,9 @@
       "name": "loan_status",
       "schema": "public",
       "values": [
-        "BORROWED",
+        "PENDING",
+        "REJECTED",
+        "ONGOING",
         "RETURNED",
         "OVERDUE"
       ]

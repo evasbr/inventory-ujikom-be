@@ -1,37 +1,64 @@
+import { relations } from 'drizzle-orm';
 import {
   pgTable,
   timestamp,
   text,
-  uniqueIndex,
   pgEnum,
   uuid,
+  varchar,
 } from 'drizzle-orm/pg-core';
-import { lifecycleColumns } from './helpers';
 
-export const gender = pgEnum('Gender', ['FEMALE', 'MALE']);
+// --- ENUMS ---
 
-export const users = pgTable(
-  'users',
-  {
-    id: uuid('id').primaryKey().defaultRandom(),
-    fullName: text('full_name').notNull(),
-    firstName: text('first_name').notNull(),
-    lastName: text('last_name'),
-    username: text().unique(),
-    email: text().notNull().unique(),
-    gender: gender(),
-    birthDate: timestamp('birth_date', { precision: 3, mode: 'string' }),
-    photo: text(),
-    ...lifecycleColumns,
-  },
-  (table) => [
-    uniqueIndex('users_email_key').using(
-      'btree',
-      table.email.asc().nullsLast(),
-    ),
-    uniqueIndex('users_username_key').using(
-      'btree',
-      table.username.asc().nullsLast(),
-    ),
-  ],
-);
+export const inventoryStatusEnum = pgEnum('inventory_status', [
+  'AVAILABLE',
+  'BORROWED',
+  'BROKEN',
+]);
+
+export const loanStatusEnum = pgEnum('loan_status', [
+  'PENDING',
+  'REJECTED',
+  'ONGOING',
+  'RETURNED',
+  'OVERDUE',
+]);
+
+// --- TABLES ---
+
+export const inventory = pgTable('inventory', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  description: text('description'),
+  status: inventoryStatusEnum('status').notNull().default('AVAILABLE'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const loans = pgTable('loans', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  inventoryId: uuid('inventory_id')
+    .references(() => inventory.id)
+    .notNull(),
+  borrowerName: varchar('borrower_name', { length: 255 }).notNull(),
+  loanDate: timestamp('loan_date').defaultNow().notNull(),
+  dueDate: timestamp('due_date'),
+  returnDate: timestamp('return_date'),
+  status: loanStatusEnum('status').notNull().default('PENDING'),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// --- RELATIONS ---
+
+export const inventoryRelations = relations(inventory, ({ many }) => ({
+  loans: many(loans),
+}));
+
+export const loansRelations = relations(loans, ({ one }) => ({
+  inventory: one(inventory, {
+    fields: [loans.inventoryId],
+    references: [inventory.id],
+  }),
+}));
